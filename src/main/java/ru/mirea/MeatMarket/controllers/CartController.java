@@ -1,7 +1,9 @@
 package ru.mirea.MeatMarket.controllers;
 
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -38,17 +40,39 @@ public class CartController {
         // Получаем все записи корзины для текущего пользователя
         List<CartItem> cartItems = cartService.getProductsByUsername(username);
 
-        // Создаем список для хранения данных о продуктах
-        List<Product> products = new ArrayList<>();
+        @Getter
+        @Setter
+        class ProductWithQuantity {
+            private Product product;
+            private int quantity;
 
-        // Для каждой записи в корзине получаем данные о продукте и добавляем их в список продуктов
-        for (CartItem cartItem : cartItems) {
-            Product product = productService.getProductById(cartItem.getProductId());
-            products.add(product);
+            public ProductWithQuantity(Product product, int quantity) {
+                this.product = product;
+                this.quantity = quantity;
+            }
         }
 
-        // Передаем список продуктов в представление
+        List<ProductWithQuantity> products = new ArrayList<>();
+
+        for (CartItem cartItem : cartItems) {
+            Product product = productService.getProductById(cartItem.getProductId());
+            int quantity = cartItem.getQuantity();
+            products.add(new ProductWithQuantity(product, quantity));
+        }
+
         model.addAttribute("products", products);
+
+//        // Создаем список для хранения данных о продуктах
+//        List<Product> products = new ArrayList<>();
+//
+//        // Для каждой записи в корзине получаем данные о продукте и добавляем их в список продуктов
+//        for (CartItem cartItem : cartItems) {
+//            Product product = productService.getProductById(cartItem.getProductId());
+//            products.add(product);
+//        }
+//
+//        // Передаем список продуктов в представление
+//        model.addAttribute("products", products);
 
         double totalPrice = cartService.calculateTotalPrice(username);
         model.addAttribute("total_price", totalPrice);
@@ -74,8 +98,24 @@ public class CartController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         WebUser user = userService.getUserByName(username);
 
-        String message = username + ", ваш заказ был оформлен! В скором времени мы отправим его к вам!";
-        emailService.sendEmail(user.getEmail(), "Ваш заказ оформлен", message);
+        List<CartItem> cartItems = cartService.getProductsByUsername(username);
+        StringBuilder message = new StringBuilder(username + ", ваш заказ был оформлен! В скором времени мы отправим его к вам!");
+        message.append("\nКупленные товары:\n===========================");
+        for (CartItem cartItem: cartItems) {
+            Product product = productService.getProductById(cartItem.getProductId());
+            message.append("\n").append(product.getName());
+            message.append("\nЦена: ").append(product.getPrice()).append(" руб.");
+            message.append("\nМасса: ").append(product.getMass()).append(" кг");
+            message.append("\nКол-во: ").append(cartItem.getQuantity()).append(" шт.");
+            message.append("\nИтого: ").append(product.getPrice() * cartItem.getQuantity()).append(" руб.");
+            message.append("--------------------------");
+        }
+        message.append("\n==========================")
+                .append("\nИтоговая сумма: ")
+                .append(cartService.calculateTotalPrice(username))
+                .append(" руб.");
+
+        emailService.sendEmail(user.getEmail(), "Ваш заказ оформлен", message.toString());
 
         cartService.deleteProductByUsername(username);
 

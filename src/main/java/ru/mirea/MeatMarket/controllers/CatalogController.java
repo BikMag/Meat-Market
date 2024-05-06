@@ -16,6 +16,8 @@ import ru.mirea.MeatMarket.services.CartService;
 import ru.mirea.MeatMarket.services.ProductService;
 import ru.mirea.MeatMarket.services.WebUserService;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class CatalogController {
@@ -27,13 +29,19 @@ public class CatalogController {
     private final CartService cartService;
 
     @GetMapping("/catalog")
-    public String showCatalog(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("username", SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName()
-        );
+    public String showCatalog(Model model,
+                              @RequestParam(value = "category", required = false) String category,
+                              @RequestParam(name = "sortBy", required = false) String sortBy,
+                              @RequestParam(name = "sortDirection", required = false, defaultValue = "asc") String sortDirection) {
+
+        // Получаем все товары или фильтруем по категории и сортируем
+        List<Product> products = productService.filterAndSortProducts(category, sortBy, sortDirection);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        model.addAttribute("username", username);
+        model.addAttribute("products", products);
+        model.addAttribute("cart", cartService.getProductsByUsername(username));
+        model.addAttribute("categories", productService.getAllCategories());
 
         return "catalog";
     }

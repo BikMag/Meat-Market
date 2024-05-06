@@ -6,12 +6,57 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<header th:include="fragments/header :: header"></header>
 <div class="container">
-    <header>
-        <p>Привет, <span th:text="${username}"></span>!</p>
-        <p><a href="/" th:href="@{/logout}"><span>Выйти</span></a></p>
-        <p><a href="/" th:href="@{/cart}"><span>Перейти в корзину</span></a></p>
-    </header>
+<!--    <p>-->
+<!--        <a href="/" th:href="@{/cart}">-->
+<!--            <span>Корзина</span>-->
+<!--            <span th:if="${cart.isEmpty()}">(пуста)</span>-->
+<!--            <span th:unless="${cart.isEmpty()}">*</span>-->
+<!--        </a>-->
+<!--    </p>-->
+    <form th:action="@{/cart}" method="get">
+        <button type="submit" class="btn btn-info">Корзина
+            <span th:if="${cart.isEmpty()}">(пуста)</span>
+            <span th:unless="${cart.isEmpty()}">(<span th:text="${cart.size()}"></span>)</span>
+        </button>
+    </form>
+
+    <!--  Фильтрация  -->
+    <div class="row mt-4 mb-3">
+        <div class="col-md-4 mb-2">
+            <label for="categoryFilter">Фильтр по категориям:</label>
+            <select class="form-control" id="categoryFilter" name="category">
+                <option value="">Все категории</option>
+                <!-- Здесь будет список категорий, загруженный из контроллера -->
+                <option th:each="category : ${categories}" th:text="${category}"></option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="sortBy">Сортировать по:</label>
+            <select class="form-control" id="sortBy" name="sortBy">
+                <option value="">Без сортировки</option>
+                <option value="name">Названию</option>
+                <option value="price">Цене</option>
+                <option value="mass">Массе</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label>Направление сортировки:</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="sortDirection" id="sortAsc" value="asc" checked>
+                <label class="form-check-label" for="sortAsc">По возрастанию</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="sortDirection" id="sortDesc" value="desc">
+                <label class="form-check-label" for="sortDesc">По убыванию</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-primary" onclick="applyFilter()">Применить фильтр</button>
+        </div>
+    </div>
+
     <h1 class="mt-5">Каталог товаров</h1>
     <div class="row row-cols-1 row-cols-md-3">
         <!-- Используем Thymeleaf для вывода данных о товарах -->
@@ -32,6 +77,15 @@
         </div>
     </div>
 </div>
+<script>
+    function applyFilter() {
+        var selectedCategory = document.getElementById("categoryFilter").value;
+        var sortBy = document.getElementById("sortBy").value;
+        var sortDirection = document.querySelector('input[name="sortDirection"]:checked').value;
+        // alert("1:" + selectedCategory + " 2:" + sortBy + " 3:" + sortDirection);
+        window.location.href = "/catalog?category=" + selectedCategory + "&sortBy=" + sortBy + "&sortDirection=" + sortDirection;
+    }
+</script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

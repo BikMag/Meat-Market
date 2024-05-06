@@ -22,6 +22,7 @@ public class CartService {
     private final ProductRepo productRepository;
 
     public void addToCart(WebUser user, Product product, int quantity) {
+        log.info("Add product {} to cart", product);
         // Создаем новую запись в корзине
         CartItem cartItem = new CartItem();
         cartItem.setUsername(user.getUsername());
@@ -33,22 +34,27 @@ public class CartService {
     }
 
     public List<CartItem> getProductsByUsername(String username) {
+        log.info("Get products from {}'s cart", username);
         return cartRepository.findByUsername(username);
     }
 
     public void deleteProductByUsernameAndId(String username, Long id) {
+        log.info("Delete product by username {} and id {}", username, id);
         cartRepository.deleteCartItemByUsernameAndProductId(username, id);
     }
 
     public void deleteProductByUsername(String username) {
+        log.info("Delete product by username {}", username);
         cartRepository.deleteCartItemByUsername(username);
     }
 
     public CartItem findByUsernameAndId(String username, Long productId) {
+        log.info("Find products by username {} and product id {}", username, productId);
         return cartRepository.findByUsernameAndProductId(username, productId);
     }
 
     public double calculateTotalPrice(String username) {
+        log.info("Calculate total price for {}'s cart", username);
         double totalPrice = 0.0;
 
         List<CartItem> cartItems = cartRepository.findByUsername(username);

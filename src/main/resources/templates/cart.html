@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+<header th:include="fragments/header :: header"></header>
 <div class="container">
     <h1 class="mt-5">Корзина</h1>
     <div th:if="${products.isEmpty()}" class="empty-cart-message">
@@ -20,14 +21,16 @@
     </div>
     <div class="row">
         <!-- Используем Thymeleaf для вывода данных о товарах -->
-        <div th:each="product : ${products}" class="col-md-12 mb-3">
+        <div th:each="cartItem : ${products}" class="col-md-12 mb-3">
             <div class="card">
                 <div class="row no-gutters">
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${product.name}"></h5>
-                            <p class="card-text"><span th:text="${product.price}"></span> руб.</p>
-                            <p class="card-text">Масса: <span th:text="${product.mass}"></span> кг</p>
+                            <h5 class="card-title" th:text="${cartItem.product.name}"></h5>
+                            <p class="card-text"><span th:text="${cartItem.product.price}"></span> руб.</p>
+                            <p class="card-text">Масса: <span th:text="${cartItem.product.mass}"></span> кг</p>
+                            <p class="card-text">Количество: <span th:text="${cartItem.quantity}"></span> шт.</p>
+                            <p class="card-text">Итого: <span th:text="${cartItem.product.price * cartItem.quantity}"></span> руб.</p>
                         </div>
                     </div>
                     <div class="col-md-2 d-flex align-items-center justify-content-center">
@@ -35,13 +38,13 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button type="button" class="btn btn-danger" th:onclick="|deleteProduct(event, '${product.id}')|">Удалить</button>
+                    <button type="button" class="btn btn-danger" th:onclick="|deleteProduct(event, '${cartItem.product.id}')|">Удалить</button>
                 </div>
             </div>
         </div>
     </div>
     <div th:unless="${products.isEmpty()}">
-        Итого: <span th:text="${total_price}"></span>
+        Итого: <span th:text="${total_price}"></span> руб.
     </div>
     <form th:unless="${products.isEmpty()}" th:action="@{/checkout}" method="post">
         <button type="submit" class="btn btn-success mt-3">Оформить заказ</button>

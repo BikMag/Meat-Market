@@ -56,6 +56,7 @@ public class WebUserService implements UserDetailsService {
     }
 
     public WebUser getUserByName(String username) {
+        log.info("Getting user with username {}...", username);
         return users.getByUsername(username);
     }
 }
