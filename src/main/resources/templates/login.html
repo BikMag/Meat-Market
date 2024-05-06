@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Security Example</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <form th:action="@{/login}" method="post" class="bg-white p-4 rounded shadow-sm">
+                <h2 class="text-center mb-4">Вход</h2>
+                <div class="form-group">
+                    <label for="username">Логин:</label>
+                    <input type="text" id="username" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+                <span>Вы здесь впервые? <a href="/register" th:href="@{/register}">Регистрация</a></span>
+                <div class="form-group">
+                    <input type="submit" value="Войти" class="btn btn-primary btn-block">
+                </div>
+                <div th:if="${param.error}" class="text-danger text-center">
+                    Неверный логин или пароль.
+                </div>
+                <div th:if="${param.logout}" class="text-success text-center">
+                    Вы вышли из своего профиля.
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

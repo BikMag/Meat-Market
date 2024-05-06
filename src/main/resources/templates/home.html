@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <!-- Название сайта и иконка -->
+            <h3><a class="navbar-brand" href="#">Meat Market</a></h3>
+            <img th:src="@{/images/icon.png}" alt="Website Icon" class="navbar-icon" style="width: 64px">
+
+            <!-- Кнопка для сворачивания на мобильных устройствах -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Правая часть шапки с приветствием и кнопкой "Выйти" -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <li class="nav-item">
+                        <span class="navbar-text mr-3">Привет, <span th:text="${username}"></span>!</span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" th:href="@{/logout}"><span>Выход</span></a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto" th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <li class="nav-item mr-3">
+                        <span class="navbar-text mr-3">Привет, новый покупатель!</span>
+                    </li>
+                    <li class="nav-item mr-3">
+                        <a href="/" th:href="@{/login}"><span>Вход</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" th:href="@{/register}"><span>Регистрация</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div th:if="${#authorization.expression('isAuthenticated()')}">
+    <h3>Привет, <span th:text="${username}"></span>!</h3>
+    <p><a href="/" th:href="@{/logout}"><span>Выйти</span></a></p>
+</div>
+<div th:unless="${#authorization.expression('isAuthenticated()')}">
+    <h3>Привет, новый покупатель!</h3>
+    <span><a href="/login" th:href="@{/login}">Вход</a></span>
+    <span><a href="/register" th:href="@{/register}">Регистрация</a></span>
+</div>
+<div th:if="${param.checkout}">
+    <div class="alert alert-info">Заказ оформлен</div>
+</div>
+
+<p><a href="/catalog" th:href="@{/catalog}">Перейти к каталогу</a></p>
+</body>
+</html>

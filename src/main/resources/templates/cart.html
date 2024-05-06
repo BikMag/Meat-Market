@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Каталог товаров</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .empty-cart-message {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-5">Корзина</h1>
+    <div th:if="${products.isEmpty()}" class="empty-cart-message">
+        <p>Ваша корзина пуста</p>
+    </div>
+    <div class="row">
+        <!-- Используем Thymeleaf для вывода данных о товарах -->
+        <div th:each="product : ${products}" class="col-md-12 mb-3">
+            <div class="card">
+                <div class="row no-gutters">
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${product.name}"></h5>
+                            <p class="card-text"><span th:text="${product.price}"></span> руб.</p>
+                            <p class="card-text">Масса: <span th:text="${product.mass}"></span> кг</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center justify-content-center">
+                        <img th:src="@{/images/placeholder.png}" class="card-img img-fluid" alt="Изображение товара">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-danger" th:onclick="|deleteProduct(event, '${product.id}')|">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${products.isEmpty()}">
+        Итого: <span th:text="${total_price}"></span>
+    </div>
+    <form th:unless="${products.isEmpty()}" th:action="@{/checkout}" method="post">
+        <button type="submit" class="btn btn-success mt-3">Оформить заказ</button>
+    </form>
+    <form th:action="@{/catalog}" method="get">
+        <button type="submit" class="btn btn-primary mt-3">Вернуться в каталог</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    function deleteProduct(event, productId) {
+        event.preventDefault();
+        if (confirm("Вы уверены, что хотите удалить этот товар?")) {
+            $.ajax({
+                url: '/deleteProduct/' + productId,
+                type: 'DELETE',
+                success: function(result) {
+                    // Обновить страницу или выполнить другие действия при успешном удалении товара
+                    location.reload();
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>
